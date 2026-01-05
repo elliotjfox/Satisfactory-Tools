@@ -15,6 +15,17 @@ public class DirectedEdgeToCircleGraphic extends DirectedEdgeGraphic {
 
     @Override
     public void setupGraphic(DoubleBinding sourceX, DoubleBinding sourceY, DoubleBinding targetX, DoubleBinding targetY) {
+        DoubleBinding sourceXFitted = Bindings.createDoubleBinding(() -> getIntercept(
+                        new Point2D(targetX.get(), targetY.get()),
+                        new Point2D(sourceX.get(), sourceY.get()),
+                        radius).orElse(new Point2D(targetX.get(), targetY.get())).getX(),
+                targetX, targetY, sourceX, sourceY);
+        DoubleBinding sourceYFitted = Bindings.createDoubleBinding(() -> getIntercept(
+                        new Point2D(targetX.get(), targetY.get()),
+                        new Point2D(sourceX.get(), sourceY.get()),
+                        radius).orElse(new Point2D(targetX.get(), targetY.get())).getY(),
+                targetX, targetY, sourceX, sourceY);
+
         DoubleBinding targetXFitted = Bindings.createDoubleBinding(() -> getIntercept(
                 new Point2D(sourceX.get(), sourceY.get()),
                 new Point2D(targetX.get(), targetY.get()),
@@ -26,7 +37,7 @@ public class DirectedEdgeToCircleGraphic extends DirectedEdgeGraphic {
                 radius).orElse(new Point2D(targetX.get(), targetY.get())).getY(),
             targetX, targetY, sourceX, sourceY);
 
-        setupArrow(sourceX, sourceY, targetXFitted, targetYFitted);
+        setupArrow(sourceXFitted, sourceYFitted, targetXFitted, targetYFitted);
     }
 
     private Optional<Point2D> getIntercept(Point2D source, Point2D target, double radius) {

@@ -11,6 +11,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.transform.Rotate;
 
 public class NetworkEdge extends GraphEdge {
 
@@ -37,7 +39,6 @@ public class NetworkEdge extends GraphEdge {
 
     private static class NetworkEdgeGraphic extends DirectedEdgeToCircleGraphic {
 
-        private final String labelText;
         private final Label label;
 
         public NetworkEdgeGraphic(double radius) {
@@ -47,7 +48,6 @@ public class NetworkEdge extends GraphEdge {
         public NetworkEdgeGraphic(double radius, String labelText) {
             super(radius);
 
-            this.labelText = labelText;
             this.label = new Label(labelText);
         }
 
@@ -56,16 +56,7 @@ public class NetworkEdge extends GraphEdge {
             super.setupArrow(sourceX, sourceY, targetX, targetY);
 
             Pane labelPane = new Pane(label);
-            labelPane.setBorder(
-                    new Border(
-                            new BorderStroke(
-                                    Color.BLACK,
-                                    BorderStrokeStyle.SOLID,
-                                    CornerRadii.EMPTY,
-                                    BorderWidths.DEFAULT
-                            )
-                    )
-            );
+
             labelPane.layoutXProperty().bind(Bindings.createDoubleBinding(
                     () -> getTextPosition(
                             new Point2D(sourceX.get(), sourceY.get()),
@@ -74,7 +65,6 @@ public class NetworkEdge extends GraphEdge {
                     ).getX(),
                     sourceX, sourceY, targetX, targetY, label.widthProperty(), label.heightProperty())
             );
-
             labelPane.layoutYProperty().bind(Bindings.createDoubleBinding(
                     () -> getTextPosition(
                             new Point2D(sourceX.get(), sourceY.get()),
@@ -84,13 +74,15 @@ public class NetworkEdge extends GraphEdge {
                     sourceX, sourceY, targetX, targetY, label.widthProperty(), label.heightProperty())
             );
 
-            // TODO: Not rotating around correct pivot (maybe use Rotation class instead?)
-            labelPane.rotateProperty().bind(Bindings.createDoubleBinding(
+            Rotate rotation = new Rotate();
+            rotation.angleProperty().bind(Bindings.createDoubleBinding(
                     () -> Math.toDegrees(getAngle(
                             new Point2D(sourceX.get(), sourceY.get()),
                             new Point2D(targetX.get(), targetY.get())
                     )), sourceX, sourceY, targetX, targetY
             ));
+
+            labelPane.getTransforms().add(rotation);
             label.relocate(0, 0);
 
             group.getChildren().add(labelPane);
