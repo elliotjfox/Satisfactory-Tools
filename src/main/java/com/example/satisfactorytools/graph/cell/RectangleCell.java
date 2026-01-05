@@ -8,7 +8,7 @@ import javafx.scene.shape.Rectangle;
 
 public class RectangleCell extends GraphCell {
     @Override
-    public Region getGraphic(Graph graph) {
+    public Region createGraphic(Graph graph) {
         Rectangle rectangle = new Rectangle(50, 50);
         rectangle.setStroke(Color.DODGERBLUE);
         rectangle.setFill(Color.DODGERBLUE);

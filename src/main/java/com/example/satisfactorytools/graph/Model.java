@@ -24,7 +24,7 @@ public class Model {
     public Model() {
         root = new GraphCell() {
             @Override
-            public Region getGraphic(Graph graph) {
+            public Region createGraphic(Graph graph) {
                 return null;
             }
         };

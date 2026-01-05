@@ -20,7 +20,7 @@ public class DirectedEdgeToCircle extends GraphEdge {
     }
 
     @Override
-    public Region getGraphic(Graph graph) {
+    public Region createGraphic(Graph graph) {
         DirectedEdgeToCircleGraphic graphic = new DirectedEdgeToCircleGraphic(radius);
 
         DoubleBinding sourceX = this.getSource().getXAnchor(graph);

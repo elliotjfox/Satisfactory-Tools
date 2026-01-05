@@ -7,7 +7,7 @@ import javafx.scene.shape.Circle;
 
 public class CircleCell extends GraphCell {
     @Override
-    public Region getGraphic(Graph graph) {
+    public Region createGraphic(Graph graph) {
         Circle circle = new Circle(25);
         circle.setStroke(Color.BLACK);
         circle.setFill(Color.DODGERBLUE);

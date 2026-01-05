@@ -6,7 +6,7 @@ import javafx.geometry.Point2D;
 
 import java.util.Optional;
 
-public class DirectedEdgeToCircleGraphic extends DirectedGraphEdgeGraphic {
+public class DirectedEdgeToCircleGraphic extends DirectedEdgeGraphic {
     private final double radius;
 
     public DirectedEdgeToCircleGraphic(double radius) {

@@ -38,7 +38,7 @@ public class NetworkCell extends GraphCell {
     }
 
     @Override
-    public Region getGraphic(Graph graph) {
+    public Region createGraphic(Graph graph) {
         Circle circle = new Circle(50);
         circle.setStroke(Color.BLACK);
         circle.setFill(Color.DODGERBLUE);

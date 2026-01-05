@@ -193,6 +193,6 @@ public class Graph {
     }
 
     public Region createGraphic(GraphNode node) {
-        return node.getGraphic(this);
+        return node.createGraphic(this);
     }
 }
