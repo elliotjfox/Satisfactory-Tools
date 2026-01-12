@@ -1,6 +1,12 @@
 package com.example.satisfactorytools.factorycalculator.nodes;
 
 import com.example.satisfactorytools.factorycalculator.network.ResourceRate;
+import com.example.satisfactorytools.graph.Graph;
+import com.example.satisfactorytools.graph.cell.graphic.CircleGraphic;
+import com.example.satisfactorytools.graph.cell.graphic.LabelCircleGraphic;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,5 +31,10 @@ public class GoalNode extends NetworkNode {
     @Override
     public String toString() {
         return "GoalNode{" + goal + "}";
+    }
+
+    @Override
+    public Region createGraphic(Graph graph) {
+        return new LabelCircleGraphic(Color.DODGERBLUE, toString());
     }
 }

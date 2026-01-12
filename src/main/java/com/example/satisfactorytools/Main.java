@@ -30,7 +30,6 @@ public class Main extends Application {
 
         Network network = NetworkBuilder.buildNetwork(new ResourceRate(ResourceType.REINFORCED_IRON_PLATE, 10));
 
-//        populateGraph(graph);
         populateGraphWithNetwork(graph, network);
 
         graph.getNodeGestures().setDragButton(MouseButton.PRIMARY);
@@ -45,16 +44,12 @@ public class Main extends Application {
     private void populateGraphWithNetwork(Graph graph, Network network) {
         Model model = graph.getModel();
 
-        Map<NetworkNode, GraphCell> map = new HashMap<>();
         List<GraphCell> sourceNodes = new ArrayList<>();
 
         for (NetworkNode node : network.getAdjacencyList().keySet()) {
-            NetworkCell cell = new NetworkCell(node.toString());
-            cell.setCellName("N{" + node + "}");
-            model.addCell(cell);
-            map.put(node, cell);
+            model.addCell(node);
             if (node instanceof SourceNode) {
-                sourceNodes.add(cell);
+                sourceNodes.add(node);
             }
         }
 
@@ -64,14 +59,14 @@ public class Main extends Application {
                 if (entry.getKey() instanceof MachineNode || entry.getKey() instanceof SourceNode) {
                     ResourceRate commonRate = getCommonRate(entry.getKey(), node);
                     if (commonRate != null) {
-                        edge = new NetworkEdge(map.get(entry.getKey()), map.get(node), commonRate.toString());
+                        edge = new NetworkEdge(entry.getKey(), node, commonRate.toString());
                     } else {
-                        edge = new DirectedEdgeToCircle(map.get(entry.getKey()), map.get(node));
+                        edge = new DirectedEdgeToCircle(entry.getKey(), node);
                     }
                 } else if (entry.getKey() instanceof SplitterNode splitterNode) {
-                    edge = new NetworkEdge(map.get(entry.getKey()), map.get(node), splitterNode.getOutput().getFirst().toString());
+                    edge = new NetworkEdge(entry.getKey(), node, splitterNode.getOutput().getFirst().toString());
                 } else {
-                    edge = new DirectedEdgeToCircle(map.get(entry.getKey()), map.get(node));
+                    edge = new DirectedEdgeToCircle(entry.getKey(), node);
                 }
                 model.addEdge(edge);
             }

@@ -8,8 +8,23 @@ import java.util.*;
 
 public class NetworkBuilder {
 
-
     public static Network buildNetwork(ResourceRate... goal) {
+        return buildNetwork(NetworkSettings.DEFAULT_SETTINGS, goal);
+    }
+
+    public static Network buildNetwork(NetworkSettings settings, ResourceRate... goal) {
+        Network network;
+        if (settings.useExactMultipliers()) {
+            network = buildExactNetwork(settings, goal);
+        } else {
+            network = buildRealisticNetwork(settings, goal);
+        }
+
+        reduceNetwork(network);
+        return network;
+    }
+
+    public static Network buildRealisticNetwork(NetworkSettings settings, ResourceRate... goal) {
         Network network = new Network();
         Queue<NetworkNode> unfinishedNodes = new LinkedList<>();
         Map<NetworkNode, ResourceRate> availableOutputs = new HashMap<>();
@@ -68,11 +83,20 @@ public class NetworkBuilder {
             }
         }
 
-        reduceNetwork(network);
+        return network;
+    }
+
+    private static Network buildExactNetwork(NetworkSettings settings, ResourceRate... goal) {
+        Network network = new Network();
         return network;
     }
 
     private static void reduceNetwork(Network network) {
+        collapseSourceNodes(network);
+        collapseSplitters(network);
+    }
+
+    private static void collapseSplitters(Network network) {
         List<NetworkNode> nodesToRemove = new ArrayList<>();
         for (Map.Entry<NetworkNode, List<NetworkNode>> entry : network.getAdjacencyList().entrySet()) {
             // If a splitter only splits to one node, remove it
@@ -90,29 +114,33 @@ public class NetworkBuilder {
         }
     }
 
-//    public static void verifyNetwork(Network network) {
-//        for (Map.Entry<NetworkNode, List<NetworkNode>> entry : network.getAdjacencyList().entrySet()) {
-//            System.out.print("Checking " + entry.getKey());
-//            for (NetworkNode node : entry.getValue()) {
-//
-//            }
-//        }
-//    }
-//
-//    private static void verifyNode(NetworkNode node, List<NetworkNode> children) {
-//        System.out.print("Checking " + node);
-//        Map<ResourceType, Double> outputs = new HashMap<>();
-//        boolean result = true;
-//        for (ResourceRate output : node.getOutput()) {
-//            if (outputs.containsKey(output.resource())) {
-//                outputs.put(output.resource(), outputs.get(output.resource()) + output.rate());
-//            } else {
-//                outputs.put(output.resource(), output.rate());
-//            }
-//        }
-//
-//        for
-//    }
+    private static void collapseSourceNodes(Network network) {
+        Map<ResourceType, List<SourceNode>> sourceNodes = new HashMap<>();
+
+        for (NetworkNode node : network.getAdjacencyList().keySet()) {
+            if (node instanceof SourceNode sourceNode) {
+                if (!sourceNodes.containsKey(sourceNode.getResourceType())) {
+                    sourceNodes.put(sourceNode.getResourceType(), new ArrayList<>());
+                }
+                sourceNodes.get(sourceNode.getResourceType()).add(sourceNode);
+            }
+        }
+
+        System.out.println(sourceNodes);
+
+        for (Map.Entry<ResourceType, List<SourceNode>> entry : sourceNodes.entrySet()) {
+            SourceNode mergedSourceNode = new SourceNode(entry.getKey(), 0);
+
+            network.addNode(mergedSourceNode);
+            for (SourceNode node : entry.getValue()) {
+                for (NetworkNode child : network.getAdjacencyList().get(node)) {
+                    network.addEdge(mergedSourceNode, child);
+                }
+                mergedSourceNode.addMultiplier(node.getRate());
+                network.removeNode(node);
+            }
+        }
+    }
 
     private static List<Recipe> getAllRecipes(ResourceType resource) {
         List<Recipe> recipes = new ArrayList<>();

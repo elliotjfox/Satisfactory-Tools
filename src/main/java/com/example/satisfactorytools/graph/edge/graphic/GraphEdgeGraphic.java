@@ -15,8 +15,4 @@ public abstract class GraphEdgeGraphic extends Pane {
     }
 
     public abstract void setupGraphic(DoubleBinding sourceX, DoubleBinding sourceY, DoubleBinding targetX, DoubleBinding targetY);
-
-    public Group getGroup() {
-        return group;
-    }
 }

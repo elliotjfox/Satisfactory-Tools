@@ -2,7 +2,6 @@ package com.example.satisfactorytools.graph.edge;
 
 import com.example.satisfactorytools.graph.Graph;
 import com.example.satisfactorytools.graph.cell.GraphCell;
-import com.example.satisfactorytools.graph.edge.graphic.DirectedEdgeGraphic;
 import com.example.satisfactorytools.graph.edge.graphic.DirectedEdgeToCircleGraphic;
 import com.example.satisfactorytools.graph.edge.graphic.GraphEdgeGraphic;
 import javafx.beans.binding.Bindings;
@@ -10,8 +9,6 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.transform.Rotate;
 
 public class NetworkEdge extends GraphEdge {

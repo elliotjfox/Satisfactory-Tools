@@ -3,6 +3,10 @@ package com.example.satisfactorytools.factorycalculator.nodes;
 import com.example.satisfactorytools.factorycalculator.gameinfo.Machine;
 import com.example.satisfactorytools.factorycalculator.gameinfo.Recipe;
 import com.example.satisfactorytools.factorycalculator.network.ResourceRate;
+import com.example.satisfactorytools.graph.Graph;
+import com.example.satisfactorytools.graph.cell.graphic.LabelCircleGraphic;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,5 +38,10 @@ public class MachineNode extends NetworkNode {
     @Override
     public String toString() {
         return machine + "{" + recipe.getName() + "}";
+    }
+
+    @Override
+    public Region createGraphic(Graph graph) {
+        return new LabelCircleGraphic(Color.FORESTGREEN, toString());
     }
 }
