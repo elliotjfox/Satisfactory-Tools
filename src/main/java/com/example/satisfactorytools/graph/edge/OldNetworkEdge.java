@@ -11,11 +11,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.transform.Rotate;
 
-public class NetworkEdge extends GraphEdge {
+public class OldNetworkEdge extends GraphEdge {
 
     private final String labelText;
 
-    public NetworkEdge(GraphCell source, GraphCell target, String labelText) {
+    public OldNetworkEdge(GraphCell source, GraphCell target, String labelText) {
         super(source, target, true);
         this.labelText = labelText;
     }

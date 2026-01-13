@@ -2,7 +2,7 @@ package com.example.satisfactorytools.factorycalculator.network;
 
 import com.example.satisfactorytools.factorycalculator.gameinfo.Recipe;
 import com.example.satisfactorytools.factorycalculator.gameinfo.ResourceType;
-import com.example.satisfactorytools.factorycalculator.nodes.*;
+import com.example.satisfactorytools.factorycalculator.node.*;
 
 import java.util.*;
 
@@ -36,59 +36,59 @@ public class NetworkBuilder {
         }
 
         // TODO: Need to implement numbers!
-        while (!unfinishedNodes.isEmpty()) {
-            System.out.println(unfinishedNodes.size() + " left");
-            NetworkNode currentNode = unfinishedNodes.remove();
-            for (ResourceRate resourceRate : currentNode.getInput()) {
-                Recipe defaultRecipe = resourceRate.resource().getDefaultRecipe();
-                if (defaultRecipe == null) {
-                    NetworkNode sourceNode = new SourceNode(resourceRate);
-                    network.addNode(sourceNode);
-                    network.addEdge(sourceNode, currentNode);
-                    continue;
-                }
-                double recipeRate = defaultRecipe.getOutput().rate();
-                double requiredRate = resourceRate.rate();
-                double multiplier = requiredRate / recipeRate;
-                int count = (int) Math.ceil(multiplier);
-
-                // We need a half input
-                if (multiplier + 0.5 == count) {
-                    count--;
-                    boolean found = false;
-                    for (Map.Entry<NetworkNode, ResourceRate> available : availableOutputs.entrySet()) {
-                        if (available.getValue().resource() == resourceRate.resource()) {
-                            network.addEdge(available.getKey(), currentNode);
-                            found = true;
-                            availableOutputs.remove(available.getKey());
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        NetworkNode splitter = new SplitterNode(defaultRecipe.getOutput(), 2);
-                        network.addNode(splitter);
-                        network.addEdge(splitter, currentNode);
-                        availableOutputs.put(splitter, splitter.getOutput().getFirst());
-                        unfinishedNodes.offer(splitter);
-                    }
-                }
-
-                for (int i = 0; i < count; i++) {
-                    NetworkNode machineNode = new MachineNode(defaultRecipe.getMachine(), defaultRecipe);
-                    network.addNode(machineNode);
-                    network.addEdge(machineNode, currentNode);
-                    unfinishedNodes.offer(machineNode);
-                }
-                // TODO: Select from available recipes
-            }
-        }
+//        while (!unfinishedNodes.isEmpty()) {
+//            System.out.println(unfinishedNodes.size() + " left");
+//            NetworkNode currentNode = unfinishedNodes.remove();
+//            for (ResourceRate resourceRate : currentNode.getInput()) {
+//                Recipe defaultRecipe = resourceRate.resource().getDefaultRecipe();
+//                if (defaultRecipe == null) {
+//                    NetworkNode sourceNode = new SourceNode(resourceRate);
+//                    network.addNode(sourceNode);
+//                    network.addEdge(sourceNode, currentNode);
+//                    continue;
+//                }
+//                double recipeRate = defaultRecipe.getOutput().rate();
+//                double requiredRate = resourceRate.rate();
+//                double multiplier = requiredRate / recipeRate;
+//                int count = (int) Math.ceil(multiplier);
+//
+//                // We need a half input
+//                if (multiplier + 0.5 == count) {
+//                    count--;
+//                    boolean found = false;
+//                    for (Map.Entry<NetworkNode, ResourceRate> available : availableOutputs.entrySet()) {
+//                        if (available.getValue().resource() == resourceRate.resource()) {
+//                            network.addEdge(available.getKey(), currentNode);
+//                            found = true;
+//                            availableOutputs.remove(available.getKey());
+//                            break;
+//                        }
+//                    }
+//                    if (!found) {
+//                        NetworkNode splitter = new SplitterNode(defaultRecipe.getOutput(), 2);
+//                        network.addNode(splitter);
+//                        network.addEdge(splitter, currentNode);
+//                        availableOutputs.put(splitter, splitter.getOutput().getFirst());
+//                        unfinishedNodes.offer(splitter);
+//                    }
+//                }
+//
+//                for (int i = 0; i < count; i++) {
+//                    NetworkNode machineNode = new MachineNode(defaultRecipe.getMachine(), defaultRecipe);
+//                    network.addNode(machineNode);
+//                    network.addEdge(machineNode, currentNode);
+//                    unfinishedNodes.offer(machineNode);
+//                }
+//                // TODO: Select from available recipes
+//            }
+//        }
 
         return network;
     }
 
     private static Network buildExactNetwork(NetworkSettings settings, ResourceRate... goal) {
-        Network network = new Network();
-        return network;
+        ExactNetworkBuilder builder = new ExactNetworkBuilder(settings, goal);
+        return builder.generateNetwork();
     }
 
     private static void reduceNetwork(Network network) {
@@ -97,27 +97,26 @@ public class NetworkBuilder {
     }
 
     private static void collapseSplitters(Network network) {
-        List<NetworkNode> nodesToRemove = new ArrayList<>();
-        for (Map.Entry<NetworkNode, List<NetworkNode>> entry : network.getAdjacencyList().entrySet()) {
-            // If a splitter only splits to one node, remove it
-            if (entry.getKey() instanceof SplitterNode splitterNode && entry.getValue().size() == 1) {
-                for (NetworkNode parent : network.getParents(splitterNode)) {
-                    network.removeEdge(parent, splitterNode);
-                    network.addEdge(parent, entry.getValue().getFirst());
-                }
-                network.removeEdge(splitterNode, entry.getValue().getFirst());
-                nodesToRemove.add(splitterNode);
-            }
-        }
-        for (NetworkNode node : nodesToRemove) {
-            network.removeNode(node);
-        }
+//        List<NetworkNode> nodesToRemove = new ArrayList<>();
+//        for (NetworkNode node : network.getAllNodes()) {
+//            if (node instanceof SplitterNode splitterNode && node.getChildren().size() == 1) {
+//                for (NetworkNode parent : node.getParents()) {
+//                    network.removeEdge(parent, splitterNode);
+//                    network.addEdge(parent, node.getChildren().getFirst());
+//                }
+//                network.removeEdge(splitterNode, node.getChildren().getFirst());
+//                nodesToRemove.add(splitterNode);
+//            }
+//        }
+//        for (NetworkNode node : nodesToRemove) {
+//            network.removeNode(node);
+//        }
     }
 
     private static void collapseSourceNodes(Network network) {
         Map<ResourceType, List<SourceNode>> sourceNodes = new HashMap<>();
 
-        for (NetworkNode node : network.getAdjacencyList().keySet()) {
+        for (NetworkNode node : network.getAllNodes()) {
             if (node instanceof SourceNode sourceNode) {
                 if (!sourceNodes.containsKey(sourceNode.getResourceType())) {
                     sourceNodes.put(sourceNode.getResourceType(), new ArrayList<>());
@@ -133,7 +132,7 @@ public class NetworkBuilder {
 
             network.addNode(mergedSourceNode);
             for (SourceNode node : entry.getValue()) {
-                for (NetworkNode child : network.getAdjacencyList().get(node)) {
+                for (NetworkNode child : node.getChildren()) {
                     network.addEdge(mergedSourceNode, child);
                 }
                 mergedSourceNode.addMultiplier(node.getRate());

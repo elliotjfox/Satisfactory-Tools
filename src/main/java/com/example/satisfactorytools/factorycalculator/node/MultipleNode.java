@@ -1,4 +1,4 @@
-package com.example.satisfactorytools.factorycalculator.nodes;
+package com.example.satisfactorytools.factorycalculator.node;
 
 public interface MultipleNode {
 

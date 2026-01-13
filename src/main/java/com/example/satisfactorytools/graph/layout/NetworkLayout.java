@@ -18,6 +18,7 @@ public class NetworkLayout implements Layout {
         Map<GraphCell, Integer> column = new HashMap<>();
 
         Queue<GraphCell> cellQueue = new LinkedList<>(sourceCells);
+        System.out.println("Layout queue: " + cellQueue);
 
         for (GraphCell cell : graph.getModel().getAllCells()) {
             column.put(cell, 0);

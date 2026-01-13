@@ -1,4 +1,4 @@
-package com.example.satisfactorytools.factorycalculator.nodes;
+package com.example.satisfactorytools.factorycalculator.node;
 
 import com.example.satisfactorytools.factorycalculator.gameinfo.ResourceType;
 import com.example.satisfactorytools.factorycalculator.network.ResourceRate;

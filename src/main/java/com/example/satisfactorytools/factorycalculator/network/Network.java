@@ -1,6 +1,7 @@
 package com.example.satisfactorytools.factorycalculator.network;
 
-import com.example.satisfactorytools.factorycalculator.nodes.NetworkNode;
+import com.example.satisfactorytools.factorycalculator.edge.NetworkEdge;
+import com.example.satisfactorytools.factorycalculator.node.NetworkNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,56 +10,71 @@ import java.util.Map;
 
 public class Network {
 
-    private final Map<NetworkNode, List<NetworkNode>> adjacencyList;
+    private final List<NetworkNode> allNodes;
+    private final List<NetworkEdge> allEdges;
 
     public Network() {
-        adjacencyList = new HashMap<>();
+        allNodes = new ArrayList<>();
+        allEdges = new ArrayList<>();
     }
 
     public void addNode(NetworkNode node) {
-        adjacencyList.put(node, new ArrayList<>(adjacencyList.size()));
+        allNodes.add(node);
     }
 
     public void removeNode(NetworkNode node) {
-        for (Map.Entry<NetworkNode, List<NetworkNode>> entry : adjacencyList.entrySet()) {
-            if (entry.getKey() == node) {
-                continue;
-            }
-            entry.getValue().remove(node);
+        List<NetworkEdge> incidentEdges = new ArrayList<>();
+        incidentEdges.addAll(node.getInEdges());
+        incidentEdges.addAll(node.getOutEdges());
+        for (NetworkEdge edge : incidentEdges) {
+            removeEdge(edge);
         }
-        adjacencyList.remove(node);
+        allNodes.remove(node);
+    }
+
+    public void addEdge(NetworkEdge edge) {
+        if (allEdges.contains(edge)) {
+            return;
+        }
+        edge.getSource().addOutEdge(edge);
+        edge.getTarget().addInEdge(edge);
+        allEdges.add(edge);
     }
 
     public void addEdge(NetworkNode from, NetworkNode to) {
-        if (isConnected(from, to)) {
+        if (from.isAdjacent(to)) {
             return;
         }
-        adjacencyList.get(from).add(to);
+        addEdge(new NetworkEdge(from, to));
+    }
+
+    public void removeEdge(NetworkEdge edge) {
+        edge.getSource().removeOutEdge(edge);
+        edge.getTarget().removeInEdge(edge);
+        allEdges.remove(edge);
     }
 
     public void removeEdge(NetworkNode from, NetworkNode to) {
-        if (!isConnected(from, to)) {
-            return;
+        for (NetworkEdge edge : from.getOutEdges()) {
+            if (edge.getTarget() == to) {
+                removeEdge(edge);
+                return;
+            }
         }
-        adjacencyList.get(from).remove(to);
-    }
-
-    public boolean isConnected(NetworkNode from, NetworkNode to) {
-        return adjacencyList.get(from).contains(to);
     }
 
     public String toAdjacencyListString() {
         StringBuilder s = new StringBuilder();
 
-        for (Map.Entry<NetworkNode, List<NetworkNode>> entry : adjacencyList.entrySet()) {
-            s.append(entry.getKey()).append(": ");
-            if (entry.getValue().isEmpty()) {
+        for (NetworkNode node : allNodes) {
+            s.append(node).append(": ");
+            if (node.getChildren().isEmpty()) {
                 s.append("\n");
                 continue;
             }
-            s.append(entry.getValue().getFirst());
-            for (int i = 1; i < entry.getValue().size(); i++) {
-                s.append(", ").append(entry.getValue().get(i));
+            s.append(node.getChildren().getFirst());
+            for (int i = 1; i < node.getChildren().size(); i++) {
+                s.append(", ").append(node.getChildren().get(i));
             }
             s.append("\n");
         }
@@ -68,17 +84,11 @@ public class Network {
         return s.toString();
     }
 
-    public Map<NetworkNode, List<NetworkNode>> getAdjacencyList() {
-        return adjacencyList;
+    public List<NetworkNode> getAllNodes() {
+        return allNodes;
     }
 
-    public List<NetworkNode> getParents(NetworkNode node) {
-        List<NetworkNode> parents = new ArrayList<>();
-        for (Map.Entry<NetworkNode, List<NetworkNode>> entry : adjacencyList.entrySet()) {
-            if (entry.getValue().contains(node) && entry.getKey() != node) {
-                parents.add(entry.getKey());
-            }
-        }
-        return parents;
+    public List<NetworkEdge> getAllEdges() {
+        return allEdges;
     }
 }

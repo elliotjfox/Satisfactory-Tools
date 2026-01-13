@@ -1,5 +1,6 @@
-package com.example.satisfactorytools.factorycalculator.nodes;
+package com.example.satisfactorytools.factorycalculator.node;
 
+import com.example.satisfactorytools.factorycalculator.edge.NetworkEdge;
 import com.example.satisfactorytools.factorycalculator.gameinfo.Machine;
 import com.example.satisfactorytools.factorycalculator.gameinfo.Recipe;
 import com.example.satisfactorytools.factorycalculator.network.ResourceRate;
@@ -11,15 +12,37 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MultipleMachineNode extends MachineNode implements MultipleNode {
 
     private double multiplier;
 
+    private MultipleMachineGraphic graphic;
+
+    private Map<ResourceRate, List<NetworkEdge>> inputs;
+
     public MultipleMachineNode(Machine machine, Recipe recipe, double multiplier) {
         super(machine, recipe);
         this.multiplier = multiplier;
+
+        inputs = new HashMap<>();
+    }
+
+    @Override
+    public void addInEdge(NetworkEdge edge) {
+        super.addInEdge(edge);
+    }
+
+    @Override
+    public void removeInEdge(NetworkEdge edge) {
+        super.removeInEdge(edge);
+    }
+
+    public boolean allRequirementsFilled() {
+        return false;
     }
 
     @Override
@@ -34,7 +57,8 @@ public class MultipleMachineNode extends MachineNode implements MultipleNode {
 
     @Override
     public Region createGraphic(Graph graph) {
-        return new MultipleMachineGraphic(Color.FORESTGREEN, toString(), multiplier);
+        graphic = new MultipleMachineGraphic(Color.FORESTGREEN, toString(), multiplier);
+        return graphic;
     }
 
     @Override
@@ -45,11 +69,17 @@ public class MultipleMachineNode extends MachineNode implements MultipleNode {
     @Override
     public void updateMultiplier(double newMultiplier) {
         this.multiplier = newMultiplier;
+        if (graphic != null) {
+            graphic.setMultiplier(this.multiplier);
+        }
     }
 
     @Override
     public void addMultiplier(double addition) {
         this.multiplier += addition;
+        if (graphic != null) {
+            graphic.setMultiplier(this.multiplier);
+        }
     }
 
     private static class MultipleMachineGraphic extends LabelCircleGraphic {
@@ -72,6 +102,10 @@ public class MultipleMachineNode extends MachineNode implements MultipleNode {
             multiplierLabel.relocate(-12.5, 12.5);
 
             group.getChildren().add(multiplierLabel);
+        }
+
+        private void setMultiplier(double multiplier) {
+            multiplierLabel.setText("x" + multiplier);
         }
     }
 }

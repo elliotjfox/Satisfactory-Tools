@@ -5,8 +5,9 @@ module com.example.satisfactorytools {
 
     opens com.example.satisfactorytools to javafx.fxml;
     exports com.example.satisfactorytools;
-    exports com.example.satisfactorytools.factorycalculator.nodes;
-    opens com.example.satisfactorytools.factorycalculator.nodes to javafx.fxml;
+    exports com.example.satisfactorytools.factorycalculator.node;
+    exports com.example.satisfactorytools.factorycalculator.edge;
+    opens com.example.satisfactorytools.factorycalculator.node to javafx.fxml;
     exports com.example.satisfactorytools.factorycalculator.network;
     opens com.example.satisfactorytools.factorycalculator.network to javafx.fxml;
     exports com.example.satisfactorytools.factorycalculator.gameinfo;

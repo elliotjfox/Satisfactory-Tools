@@ -4,10 +4,9 @@ import com.example.satisfactorytools.factorycalculator.gameinfo.ResourceType;
 import com.example.satisfactorytools.factorycalculator.network.Network;
 import com.example.satisfactorytools.factorycalculator.network.NetworkBuilder;
 import com.example.satisfactorytools.factorycalculator.network.ResourceRate;
-import com.example.satisfactorytools.factorycalculator.nodes.MachineNode;
-import com.example.satisfactorytools.factorycalculator.nodes.NetworkNode;
-import com.example.satisfactorytools.factorycalculator.nodes.SourceNode;
-import com.example.satisfactorytools.factorycalculator.nodes.SplitterNode;
+import com.example.satisfactorytools.factorycalculator.node.MachineNode;
+import com.example.satisfactorytools.factorycalculator.node.NetworkNode;
+import com.example.satisfactorytools.factorycalculator.node.SourceNode;
 import com.example.satisfactorytools.graph.Graph;
 import com.example.satisfactorytools.graph.Model;
 import com.example.satisfactorytools.graph.cell.CircleCell;
@@ -46,27 +45,27 @@ public class Main extends Application {
 
         List<GraphCell> sourceNodes = new ArrayList<>();
 
-        for (NetworkNode node : network.getAdjacencyList().keySet()) {
+        for (NetworkNode node : network.getAllNodes()) {
             model.addCell(node);
             if (node instanceof SourceNode) {
                 sourceNodes.add(node);
             }
         }
 
-        for (Map.Entry<NetworkNode, List<NetworkNode>> entry : network.getAdjacencyList().entrySet()) {
-            for (NetworkNode node : entry.getValue()) {
+        for (NetworkNode node : network.getAllNodes()) {
+            for (NetworkNode child : node.getChildren()) {
                 GraphEdge edge;
-                if (entry.getKey() instanceof MachineNode || entry.getKey() instanceof SourceNode) {
-                    ResourceRate commonRate = getCommonRate(entry.getKey(), node);
+                if (node instanceof MachineNode || node instanceof SourceNode) {
+                    ResourceRate commonRate = getCommonRate(node, child);
                     if (commonRate != null) {
-                        edge = new NetworkEdge(entry.getKey(), node, commonRate.toString());
+                        edge = new OldNetworkEdge(node, child, commonRate.toString());
                     } else {
-                        edge = new DirectedEdgeToCircle(entry.getKey(), node);
+                        edge = new DirectedEdgeToCircle(node, child);
                     }
-                } else if (entry.getKey() instanceof SplitterNode splitterNode) {
-                    edge = new NetworkEdge(entry.getKey(), node, splitterNode.getOutput().getFirst().toString());
+                } else if (node instanceof SplitterNode splitterNode) {
+                    edge = new OldNetworkEdge(node, child, splitterNode.getOutput().getFirst().toString());
                 } else {
-                    edge = new DirectedEdgeToCircle(entry.getKey(), node);
+                    edge = new DirectedEdgeToCircle(node, child);
                 }
                 model.addEdge(edge);
             }
